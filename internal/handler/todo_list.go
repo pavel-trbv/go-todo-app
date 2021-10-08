@@ -95,9 +95,7 @@ func (h *Handler) updateList(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, statusResponse{
-		Status: "ok",
-	})
+	c.Status(http.StatusOK)
 }
 
 func (h *Handler) deleteList(c *gin.Context) {
@@ -118,7 +116,5 @@ func (h *Handler) deleteList(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, statusResponse{
-		Status: "ok",
-	})
+	c.Status(http.StatusOK)
 }

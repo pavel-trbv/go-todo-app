@@ -5,6 +5,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/pavel-trbv/go-todo-app/internal/domain"
 	"github.com/sirupsen/logrus"
+	"reflect"
 	"strings"
 )
 
@@ -67,8 +68,7 @@ func (r *TodoListPostgres) GetById(userId, listId int) (domain.TodoList, error) 
 
 func (r *TodoListPostgres) Delete(userId, listId int) error {
 	query := fmt.Sprintf(
-		`DELETE FROM %s tl USING %s ul 
-				WHERE tl.id = ul.list_id AND ul.user_id = $1 AND ul.list_id = $2`,
+		`DELETE FROM %s tl USING %s ul WHERE tl.id = ul.list_id AND ul.user_id = $1 AND ul.list_id = $2`,
 		todoListsTable,
 		usersListsTable,
 	)
@@ -82,23 +82,21 @@ func (r *TodoListPostgres) Update(userId, listId int, input domain.UpdateListInp
 	args := make([]interface{}, 0)
 	argId := 1
 
-	if input.Title != nil {
-		setValues = append(setValues, fmt.Sprintf("title = $%d", argId))
-		args = append(args, *input.Title)
-		argId++
-	}
-
-	if input.Description != nil {
-		setValues = append(setValues, fmt.Sprintf("description = $%d", argId))
-		args = append(args, *input.Description)
-		argId++
+	v := reflect.ValueOf(input)
+	for i := 0; i < v.NumField(); i++ {
+		key := v.Type().Field(i).Name
+		if !v.Field(i).IsNil() {
+			value := v.Field(i).Elem().Interface()
+			setValues = append(setValues, fmt.Sprintf("%s = $%d", key, argId))
+			args = append(args, value)
+			argId++
+		}
 	}
 
 	setQuery := strings.Join(setValues, ", ")
 
 	query := fmt.Sprintf(
-		`UPDATE %s tl SET %s FROM %s ul 
-				WHERE tl.id = ul.list_id AND ul.list_id = $%d AND ul.user_id = $%d`,
+		`UPDATE %s tl SET %s FROM %s ul WHERE tl.id = ul.list_id AND ul.list_id = $%d AND ul.user_id = $%d`,
 		todoListsTable,
 		setQuery,
 		usersListsTable,
