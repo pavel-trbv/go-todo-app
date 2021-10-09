@@ -5,6 +5,8 @@ import (
 	"github.com/pavel-trbv/go-todo-app/internal/repository"
 )
 
+//go:generate mockgen -source=service.go -destination=mocks/mock.go
+
 type Authorization interface {
 	CreateUser(user domain.User) (int, error)
 	GenerateToken(username, password string) (string, error)
@@ -25,10 +27,6 @@ type TodoItem interface {
 	GetById(userId, itemId int) (domain.TodoItem, error)
 	Delete(userId, itemId int) error
 	Update(userId, itemId int, input domain.UpdateItemInput) error
-}
-
-type TestStruct struct {
-	field1 string
 }
 
 type Service struct {
