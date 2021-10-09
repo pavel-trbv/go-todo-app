@@ -25,6 +25,16 @@ func (h *Handler) userIdentity(c *gin.Context) {
 		return
 	}
 
+	if headerParts[0] != "Bearer" {
+		newErrorResponse(c, http.StatusUnauthorized, "invalid auth header")
+		return
+	}
+
+	if headerParts[1] == "" {
+		newErrorResponse(c, http.StatusUnauthorized, "token is empty")
+		return
+	}
+
 	token := headerParts[1]
 	userId, err := h.services.Authorization.ParseToken(token)
 	if err != nil {
@@ -37,13 +47,11 @@ func (h *Handler) userIdentity(c *gin.Context) {
 func getUserId(c *gin.Context) (int, error) {
 	id, ok := c.Get(userCtx)
 	if !ok {
-		newErrorResponse(c, http.StatusInternalServerError, "user id not found")
 		return 0, errors.New("user id not found")
 	}
 
 	idInt, ok := id.(int)
 	if !ok {
-		newErrorResponse(c, http.StatusInternalServerError, "user id is of invalid type")
 		return 0, errors.New("user id is of invalid type")
 	}
 
