@@ -9,7 +9,7 @@ import (
 func (h *Handler) signUp(c *gin.Context) {
 	var input domain.User
 	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
@@ -32,7 +32,7 @@ type signInInput struct {
 func (h *Handler) signIn(c *gin.Context) {
 	var input signInInput
 	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
