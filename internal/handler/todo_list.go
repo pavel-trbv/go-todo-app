@@ -16,7 +16,7 @@ func (h *Handler) createList(c *gin.Context) {
 
 	var input domain.TodoList
 	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
 		return
 	}
 
