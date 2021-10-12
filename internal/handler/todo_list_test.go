@@ -49,6 +49,30 @@ func TestHandler_createList(t *testing.T) {
 			expectedRequestBody: `{"id":1}`,
 		},
 		{
+			name:      "Provide only title",
+			inputBody: `{"title":"list title"}`,
+			inputList: domain.TodoList{
+				Title: "list title",
+			},
+			userId: 1,
+			mockBehavior: func(s *mock_service.MockTodoList, userId interface{}, list domain.TodoList) {
+				s.EXPECT().Create(userId, list).Return(1, nil)
+			},
+			expectedStatusCode:  200,
+			expectedRequestBody: `{"id":1}`,
+		},
+		{
+			name:      "Provide only description",
+			inputBody: `{"description":"desc"}`,
+			inputList: domain.TodoList{
+				Description: "desc",
+			},
+			userId:              1,
+			mockBehavior:        func(s *mock_service.MockTodoList, userId interface{}, list domain.TodoList) {},
+			expectedStatusCode:  400,
+			expectedRequestBody: `{"message": "invalid input body"}`,
+		},
+		{
 			name:                "Missing user id",
 			mockBehavior:        func(s *mock_service.MockTodoList, userId interface{}, list domain.TodoList) {},
 			expectedStatusCode:  500,
